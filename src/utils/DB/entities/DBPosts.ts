@@ -10,13 +10,17 @@ export type PostEntity = {
 type CreatePostDTO = Omit<PostEntity, 'id'>;
 type ChangePostDTO = Partial<Omit<PostEntity, 'id' | 'userId'>>;
 
-export default class DBPosts extends DBEntity<PostEntity, ChangePostDTO> {
-  async create(createUserDTO: CreatePostDTO) {
+export default class DBPosts extends DBEntity<
+  PostEntity,
+  ChangePostDTO,
+  CreatePostDTO
+> {
+  async create(dto: CreatePostDTO) {
     const created = {
-      ...createUserDTO,
+      ...dto,
       id: crypto.randomUUID(),
     };
-    this.entity.push(created);
+    this.entities.push(created);
     return created;
   }
 }

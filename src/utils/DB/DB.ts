@@ -5,25 +5,29 @@ import DBUsers from './entities/DBUsers';
 import * as lodash from 'lodash';
 
 export default class DB {
-  users: DBUsers;
-  profiles: DBProfiles;
-  memberTypes: DBMemberTypes;
-  posts: DBPosts;
+  users = new DBUsers();
+  profiles = new DBProfiles();
+  memberTypes = new DBMemberTypes();
+  posts = new DBPosts();
 
   constructor() {
-    const proxyHandler = {
-      get: (target: any, prop: any) => {
+    const deepCopyResultTrap: ProxyHandler<any> = {
+      get: (target, prop) => {
         if (typeof target[prop] === 'function') {
-          return async (...args: any[]) =>
-            lodash.cloneDeep(await target[prop](...args));
+          return (...args: any[]) => {
+            const result = target[prop](...args);
+            if (result instanceof Promise) {
+              return result.then((v) => lodash.cloneDeep(v));
+            }
+            return lodash.cloneDeep(result);
+          };
         } else {
           return target[prop];
         }
       },
     };
-    this.users = new Proxy(new DBUsers(), proxyHandler);
-    this.profiles = new Proxy(new DBProfiles(), proxyHandler);
-    this.memberTypes = new Proxy(new DBMemberTypes(), proxyHandler);
-    this.posts = new Proxy(new DBPosts(), proxyHandler);
+    for (const [k, v] of Object.entries(this)) {
+      this[k as keyof typeof this] = new Proxy(v, deepCopyResultTrap);
+    }
   }
 }
