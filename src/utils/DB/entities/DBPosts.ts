@@ -16,7 +16,7 @@ export default class DBPosts extends DBEntity<
   CreatePostDTO
 > {
   async create(dto: CreatePostDTO) {
-    const created = {
+    const created: PostEntity = {
       ...dto,
       id: crypto.randomUUID(),
     };

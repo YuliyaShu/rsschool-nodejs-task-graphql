@@ -4,7 +4,7 @@ export const createPostBodySchema = {
   properties: {
     title: { type: 'string' },
     content: { type: 'string' },
-    userId: { type: 'string' },
+    userId: { type: 'string', format: 'uuid' },
   },
   additionalProperties: false,
 } as const;

@@ -3,8 +3,7 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import {
   createUserBodySchema,
   changeUserBodySchema,
-  subscribeToBodySchema,
-  unsubscribeFromBodySchema,
+  subscribeBodySchema,
 } from './schemas';
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
 import { USER_ERROR_MESSAGE, SUBSCRIBE_ERROR_MESSAGE, NOT_SUBSCRIBE_ERROR_MESSAGE } from '../../utils/constants';
@@ -87,7 +86,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     '/:id/subscribeTo',
     {
       schema: {
-        body: subscribeToBodySchema,
+        body: subscribeBodySchema,
         params: idParamSchema,
       },
     },
@@ -120,7 +119,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     '/:id/unsubscribeFrom',
     {
       schema: {
-        body: unsubscribeFromBodySchema,
+        body: subscribeBodySchema,
         params: idParamSchema,
       },
     },

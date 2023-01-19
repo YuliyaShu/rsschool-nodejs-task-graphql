@@ -6,15 +6,9 @@ export type UserEntity = {
   firstName: string;
   lastName: string;
   email: string;
-  profileId: string | null;
-  userSubscribedToIds: string[];
   subscribedToUserIds: string[];
-  postIds: string[];
 };
-type CreateUserDTO = Omit<
-  UserEntity,
-  'id' | 'profileId' | 'userSubscribedToIds' | 'subscribedToUserIds' | 'postIds'
->;
+type CreateUserDTO = Omit<UserEntity, 'id' | 'subscribedToUserIds'>;
 type ChangeUserDTO = Partial<Omit<UserEntity, 'id'>>;
 
 export default class DBUsers extends DBEntity<
@@ -23,13 +17,10 @@ export default class DBUsers extends DBEntity<
   CreateUserDTO
 > {
   async create(dto: CreateUserDTO) {
-    const created = {
+    const created: UserEntity = {
       ...dto,
-      id: crypto.randomUUID(),
-      profileId: null,
-      userSubscribedToIds: [],
       subscribedToUserIds: [],
-      postIds: [],
+      id: crypto.randomUUID(),
     };
     this.entities.push(created);
     return created;

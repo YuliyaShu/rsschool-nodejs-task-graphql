@@ -19,20 +19,11 @@ export const changeUserBodySchema = {
   additionalProperties: false,
 } as const;
 
-export const subscribeToBodySchema = {
+export const subscribeBodySchema = {
   type: 'object',
   required: ['userId'],
   properties: {
-    userId: { type: 'string' },
-  },
-  additionalProperties: false,
-} as const;
-
-export const unsubscribeFromBodySchema = {
-  type: 'object',
-  required: ['userId'],
-  properties: {
-    userId: { type: 'string' },
+    userId: { type: 'string', format: 'uuid' },
   },
   additionalProperties: false,
 } as const;

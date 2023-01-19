@@ -1,127 +1,114 @@
 import { test } from 'tap';
 import { build } from '../helper';
-import { createUser, createProfile } from '../utils/requests';
+import { createUser, createProfile, getProfile } from '../utils/requests';
 
 test('posts', async (t) => {
   const app = await build(t);
 
+  await t.test('GET /profiles/:id => failure; fake params.id', async (t) => {
+    const { res: resReceivedProfile1 } = await getProfile(app, 'fakeId');
+
+    t.ok(resReceivedProfile1.statusCode === 404);
+  });
+
   await t.test('POST /profiles => failure; fake body.userId', async (t) => {
-    const { res: res_createProfile } = await createProfile(
+    const { res: resCreateProfile } = await createProfile(
       app,
       'fakeId',
       'basic'
     );
 
-    t.ok(res_createProfile.statusCode > 300);
+    t.ok(resCreateProfile.statusCode === 400);
   });
 
+  await t.test(
+    'POST /profiles => failure; fake body.memberTypeId',
+    async (t) => {
+      const { body: user1 } = await createUser(app);
+      const { res: resCreateProfile1 } = await createProfile(
+        app,
+        user1.id,
+        'fakeId'
+      );
+
+      t.ok(resCreateProfile1.statusCode === 400);
+    }
+  );
+
   await t.test('POST /profiles => success', async (t) => {
-    let { body: user } = await createUser(app);
-    let { body: profile } = await createProfile(app, user.id, 'basic');
+    const { body: user1 } = await createUser(app);
+    const { body: profile1 } = await createProfile(app, user1.id, 'basic');
 
-    t.ok(profile.userId === user.id, 'userId should be correct');
-
-    user = await app
-      .inject({
-        url: `/users/${user.id}`,
-      })
-      .then((r: any) => r.json(0));
-    t.ok(user.profileId === profile.id, 'profileId should be updated');
+    const { body: receivedProfile1 } = await getProfile(app, profile1.id);
+    t.ok(profile1.id === receivedProfile1!.id);
   });
 
   await t.test(
     'POST /profiles => failure; user already has a profile',
     async (t) => {
-      let { body: user } = await createUser(app);
-      await createProfile(app, user.id, 'basic');
-      let { res: res_createProfile } = await createProfile(
+      const { body: user1 } = await createUser(app);
+      await createProfile(app, user1.id, 'basic');
+      const { res: resCreateProfile1 } = await createProfile(
         app,
-        user.id,
+        user1.id,
         'basic'
       );
 
-      t.ok(res_createProfile.statusCode > 300);
+      t.ok(resCreateProfile1.statusCode === 400);
     }
   );
 
   await t.test('PATCH /profiles/:id => failure; fake params.id', async (t) => {
-    const res_patchProfile = await app.inject({
+    const resPatchProfile = await app.inject({
       url: `/profiles/fakeId`,
       method: 'PATCH',
       payload: {},
     });
 
-    t.ok(res_patchProfile.statusCode > 300);
+    t.ok(resPatchProfile.statusCode === 400);
   });
 
   await t.test('PATCH /profiles/:id => success', async (t) => {
-    const { body: user } = await createUser(app);
-    let { body: profile } = await createProfile(app, user.id, 'basic');
+    const { body: user1 } = await createUser(app);
+    const { body: profile1 } = await createProfile(app, user1.id, 'basic');
 
     const changedCity = 'Svetlogorsk';
+    const changedMemberTypeId = 'business';
+    await app.inject({
+      url: `/profiles/${profile1.id}`,
+      method: 'PATCH',
+      payload: {
+        city: changedCity,
+        memberTypeId: changedMemberTypeId,
+      },
+    });
 
-    profile = await app
-      .inject({
-        url: `/profiles/${profile.id}`,
-        method: 'PATCH',
-        payload: {
-          city: changedCity,
-          memberTypeId: 'business',
-        },
-      })
-      .then((r: any) => r.json(0));
-    t.ok(profile.city === changedCity, 'city should be changed');
-
-    const prevMemberType = await app
-      .inject({
-        url: `/member-types/basic`,
-      })
-      .then((r: any) => r.json(0));
-    const curMemberType = await app
-      .inject({
-        url: `/member-types/business`,
-      })
-      .then((r: any) => r.json(0));
+    const { body: receivedProfile1 } = await getProfile(app, profile1.id);
     t.ok(
-      !prevMemberType.profileIds.includes(profile.id) &&
-        curMemberType.profileIds.includes(profile.id),
-      'profileIds should be updated'
+      receivedProfile1!.city === changedCity &&
+        receivedProfile1!.memberTypeId === changedMemberTypeId
     );
   });
 
   await t.test('DELETE /profiles/:id => failure; fake params.id', async (t) => {
-    const res_deleteProfile = await app.inject({
+    const resDeleteProfile = await app.inject({
       url: `/profiles/fakeId`,
       method: 'DELETE',
     });
 
-    t.ok(res_deleteProfile.statusCode > 300);
+    t.ok(resDeleteProfile.statusCode === 400);
   });
 
   await t.test('DELETE /profiles/:id => success', async (t) => {
-    let { body: user } = await createUser(app);
-    const { body: profile } = await createProfile(app, user.id, 'basic');
+    const { body: user1 } = await createUser(app);
+    const { body: profile1 } = await createProfile(app, user1.id, 'basic');
 
     await app.inject({
-      url: `/profiles/${profile.id}`,
+      url: `/profiles/${profile1.id}`,
       method: 'DELETE',
     });
 
-    user = await app
-      .inject({
-        url: `/users/${user.id}`,
-      })
-      .then((r: any) => r.json());
-    t.ok(user.profileId === null, 'profileId should be updated');
-
-    const memberType = await app
-      .inject({
-        url: `/member-types/basic`,
-      })
-      .then((r: any) => r.json(0));
-    t.ok(
-      !memberType.profileIds.includes(profile.id),
-      'profileIds should be updated'
-    );
+    const { res: resReceivedProfile1 } = await getProfile(app, profile1.id);
+    t.ok(resReceivedProfile1.statusCode === 404);
   });
 });

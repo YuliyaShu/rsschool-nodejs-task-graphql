@@ -21,7 +21,7 @@ export default class DBProfiles extends DBEntity<
   CreateProfileDTO
 > {
   async create(dto: CreateProfileDTO) {
-    const created = {
+    const created: ProfileEntity = {
       ...dto,
       id: crypto.randomUUID(),
     };
