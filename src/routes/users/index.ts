@@ -13,7 +13,8 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
   fastify.get('/', async function (request, reply): Promise<UserEntity[]> {
-    return await fastify.db.users.findMany();
+    const allUsers = await fastify.db.users.findMany();
+    return allUsers;
   });
 
   fastify.get(
@@ -92,8 +93,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     },
     async function (request, reply): Promise<UserEntity | Error> {
       const userWhoSubscribe = await fastify.db.users.findOne(request.params.id);
-      console.log('🚀 ~ who', request.params.id);
-      console.log('🚀 ~ on who', request.body.userId);
       if (!userWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -103,20 +102,16 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       } else {
         return fastify.httpErrors.conflict(SUBSCRIBE_ERROR_MESSAGE);
       }
-      
       const updatedUserWhoSubscribe = await fastify.db.users.findOne(request.params.id);
       if (!updatedUserWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-
       const userOnWhomSubscribed = await fastify.db.users.findOne(request.body.userId);
-      
       if (!userOnWhomSubscribed) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
       userOnWhomSubscribed.subscribedToUserIds.push(request.params.id);
       await fastify.db.users.change(request.body.userId, {subscribedToUserIds: userOnWhomSubscribed.subscribedToUserIds})
-
       return updatedUserWhoSubscribe;
     }
   );
@@ -142,7 +137,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (!updatedUserWhoUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-
       const userFromWhomUnSubscribed = await fastify.db.users.findOne(request.body.userId);
       if (!userFromWhomUnSubscribed) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
