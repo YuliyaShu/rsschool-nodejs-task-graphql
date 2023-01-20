@@ -31,15 +31,15 @@ export default abstract class DBEntity<
     entity: T,
     options: Options<T, K>
   ) {
-    if (options?.equals) {
+    if (options.equals) {
       return lodash.isEqual(entity[options.key], options.equals);
     }
-    if (options?.equalsAnyOf) {
+    if (options.equalsAnyOf) {
       return options.equalsAnyOf.some((value) =>
         lodash.isEqual(entity[options.key], value)
       );
     }
-    if (options?.inArray) {
+    if (options.inArray) {
       const array = entity[options.key] as typeof options.inArray[];
       return array.some((value) => lodash.isEqual(value, options.inArray));
     }
@@ -76,7 +76,7 @@ export default abstract class DBEntity<
   async findMany<K extends keyof Entity>(
     options?: Options<Entity, K>
   ): Promise<Entity[]> {
-    if (!options?.equals && !options?.equalsAnyOf && !options?.inArray) {
+    if (!options) {
       return this.entities;
     }
     return this.entities.filter((entity) => this.runChecks(entity, options));

@@ -1,5 +1,7 @@
 ## Assignment: Graphql
 
+## TASK DESCRIPTION IS OUT OF DATE. The final version will be available at the time of issuing the assignment.
+
 ### Tasks:
 1. (0.2) Add logic to the restful endpoints (users, posts, profiles, member-types folders in ./src/routes).  
    1.1. npm run test - 100%  
