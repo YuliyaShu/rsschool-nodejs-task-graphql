@@ -13,16 +13,16 @@ test('users', async (t) => {
   const app = await build(t);
 
   await t.test('GET /users/:id => failure; fake params.id', async (t) => {
-    const { res: resReceivedUser1 } = await getUser(app, 'fakeId');
+    const { res: resReceivedUser } = await getUser(app, 'fakeId');
 
-    t.ok(resReceivedUser1.statusCode === 404);
+    t.ok(resReceivedUser.statusCode === 404);
   });
 
   await t.test('POST /users => success', async (t) => {
     const { body: user1 } = await createUser(app);
     const { body: receivedUser1 } = await getUser(app, user1.id);
 
-    t.ok(receivedUser1!.id === user1.id);
+    t.ok(receivedUser1.id === user1.id);
   });
 
   await t.test('PATCH /users/:id => failure; fake params.id', async (t) => {
@@ -49,7 +49,7 @@ test('users', async (t) => {
 
     const { body: receivedUser } = await getUser(app, user1.id);
 
-    t.ok(receivedUser!.email === changedEmail);
+    t.ok(receivedUser.email === changedEmail);
   });
 
   await t.test('POST /users/:id/subscribeTo => success', async (t) => {
@@ -74,8 +74,8 @@ test('users', async (t) => {
 
     const { body: receivedUser3 } = await getUser(app, user3.id);
     t.ok(
-      receivedUser3!.subscribedToUserIds.includes(user1.id) &&
-        receivedUser3!.subscribedToUserIds.includes(user2.id)
+      receivedUser3.subscribedToUserIds.includes(user1.id) &&
+        receivedUser3.subscribedToUserIds.includes(user2.id)
     );
   });
 
@@ -158,8 +158,8 @@ test('users', async (t) => {
 
     const { body: receivedUser3 } = await getUser(app, user3.id);
     t.ok(
-      receivedUser3!.subscribedToUserIds.includes(user2.id) &&
-        !receivedUser3!.subscribedToUserIds.includes(user1.id)
+      receivedUser3.subscribedToUserIds.includes(user2.id) &&
+        !receivedUser3.subscribedToUserIds.includes(user1.id)
     );
   });
 
@@ -197,7 +197,7 @@ test('users', async (t) => {
       t.ok(resReceivedUser1.statusCode === 404);
 
       const { body: receivedUser2 } = await getUser(app, user2.id);
-      t.ok(!receivedUser2!.subscribedToUserIds.includes(user1.id));
+      t.ok(!receivedUser2.subscribedToUserIds.includes(user1.id));
 
       const { res: resReceivedProfile1 } = await getProfile(app, profile1.id);
       t.ok(resReceivedProfile1.statusCode === 404);

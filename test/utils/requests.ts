@@ -13,7 +13,7 @@ export async function getUser(app: any, id: string) {
     url: `/users/${id}`,
     method: 'GET',
   });
-  const body = res ? ((await res.json()) as UserEntity) : null;
+  const body = (await res.json()) as UserEntity;
   return { res, body };
 }
 
@@ -22,7 +22,7 @@ export async function getProfile(app: any, id: string) {
     url: `/profiles/${id}`,
     method: 'GET',
   });
-  const body = res ? ((await res.json()) as ProfileEntity) : null;
+  const body = (await res.json()) as ProfileEntity;
   return { res, body };
 }
 
@@ -31,7 +31,7 @@ export async function getPost(app: any, id: string) {
     url: `/posts/${id}`,
     method: 'GET',
   });
-  const body = res ? ((await res.json()) as PostEntity) : null;
+  const body = (await res.json()) as PostEntity;
   return { res, body };
 }
 
@@ -40,7 +40,7 @@ export async function getMemberType(app: any, id: string) {
     url: `/member-types/${id}`,
     method: 'GET',
   });
-  const body = res ? ((await res.json()) as MemberTypeEntity) : null;
+  const body = (await res.json()) as MemberTypeEntity;
   return { res, body };
 }
 
