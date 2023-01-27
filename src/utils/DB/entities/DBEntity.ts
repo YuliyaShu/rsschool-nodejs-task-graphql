@@ -7,6 +7,7 @@ interface Options<T, K extends keyof T> {
   equals?: T[K];
   equalsAnyOf?: T[K][];
   inArray?: UnpackArray<T[K]>;
+  inArrayAnyOf?: UnpackArray<T[K]> extends never ? never : UnpackArray<T[K]>[];
 }
 type OptionsEquals<T, K extends keyof T> = Required<
   Pick<Options<T, K>, 'key' | 'equals'>
@@ -16,6 +17,9 @@ type OptionsEqualsAnyOf<T, K extends keyof T> = Required<
 >;
 type OptionsInArray<T, K extends keyof T> = Required<
   Pick<Options<T, K>, 'key' | 'inArray'>
+>;
+type OptionsInArrayAnyOf<T, K extends keyof T> = Required<
+  Pick<Options<T, K>, 'key' | 'inArrayAnyOf'>
 >;
 
 export default abstract class DBEntity<
@@ -35,13 +39,21 @@ export default abstract class DBEntity<
       return lodash.isEqual(entity[options.key], options.equals);
     }
     if (options.equalsAnyOf) {
-      return options.equalsAnyOf.some((value) =>
-        lodash.isEqual(entity[options.key], value)
+      return options.equalsAnyOf.some((inputValue) =>
+        lodash.isEqual(entity[options.key], inputValue)
       );
     }
     if (options.inArray) {
       const array = entity[options.key] as typeof options.inArray[];
       return array.some((value) => lodash.isEqual(value, options.inArray));
+    }
+    if (options.inArrayAnyOf) {
+      const array = entity[options.key] as typeof options.inArray[];
+      return array.some((value) =>
+        options.inArrayAnyOf?.some((valueInput) =>
+          lodash.isEqual(value, valueInput)
+        )
+      );
     }
     return false;
   }
@@ -54,6 +66,9 @@ export default abstract class DBEntity<
   ): Promise<Entity | null>;
   async findOne<K extends keyof Entity>(
     options: OptionsInArray<Entity, K>
+  ): Promise<Entity | null>;
+  async findOne<K extends keyof Entity>(
+    options: OptionsInArrayAnyOf<Entity, K>
   ): Promise<Entity | null>;
   async findOne<K extends keyof Entity>(
     options: Options<Entity, K>
@@ -71,6 +86,9 @@ export default abstract class DBEntity<
   ): Promise<Entity[]>;
   async findMany<K extends keyof Entity>(
     option: OptionsInArray<Entity, K>
+  ): Promise<Entity[]>;
+  async findMany<K extends keyof Entity>(
+    option: OptionsInArrayAnyOf<Entity, K>
   ): Promise<Entity[]>;
   async findMany<K extends keyof Entity>(): Promise<Entity[]>;
   async findMany<K extends keyof Entity>(
