@@ -68,26 +68,14 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (profile) {
         await fastify.db.profiles.delete(profile.id);
       }
-      const deletedUser = await fastify.db.users.delete(request.params.id);
-      if (!deletedUser) { 
-        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      }
-      deletedUser.subscribedToUserIds.map(async(userIdOnWhom) => {
-        const userOnWhom = await fastify.db.users.findOne({key: "id", equals: userIdOnWhom});
-        if (!userOnWhom) { 
-          return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-        }
-        const newSubscriptions = userOnWhom.subscribedToUserIds.filter((id) => id !== deletedUser.id);
-        await fastify.db.users.change(userIdOnWhom, { subscribedToUserIds: newSubscriptions});
+      
+      const subscribedUsers = await fastify.db.users.findMany({key: "subscribedToUserIds", inArray: request.params.id})
+      subscribedUsers.map(async(userWhoSubscribe) => {
+        const updatedSubscriptions = userWhoSubscribe.subscribedToUserIds.filter((id) => id !== request.params.id);
+        await fastify.db.users.change(userWhoSubscribe.id, { subscribedToUserIds: updatedSubscriptions});
       })
-      // deletedUser.userSubscribedToIds.map(async(userIdFromWhom) => {
-      //   const userFromWhom = await fastify.db.users.findOne(userIdFromWhom);
-      //   if (!userFromWhom) { 
-      //     return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      //   }
-      //   const newSubscriptions = userFromWhom.subscribedToUserIds.filter((id) => id !== deletedUser.id);
-      //   await fastify.db.users.change(userIdFromWhom, { subscribedToUserIds: newSubscriptions});
-      // })
+
+      const deletedUser = await fastify.db.users.delete(request.params.id);
       return deletedUser;
     }
   );
@@ -101,26 +89,24 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const userWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const userWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
       if (!userWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      if (!userWhoSubscribe.subscribedToUserIds.includes(request.body.userId)) {
-        userWhoSubscribe.subscribedToUserIds.push(request.body.userId);
+      const userOnWhomSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      if (!userOnWhomSubscribe) { 
+        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
+      }
+      if (!(userWhoSubscribe.subscribedToUserIds.includes(request.params.id))) {
+        userWhoSubscribe.subscribedToUserIds.push(request.params.id);
         await fastify.db.users.change(userWhoSubscribe.id, { subscribedToUserIds: userWhoSubscribe.subscribedToUserIds})
       } else {
         return fastify.httpErrors.conflict(SUBSCRIBE_ERROR_MESSAGE);
       }
-      const updatedUserWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const updatedUserWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
       if (!updatedUserWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      // const userOnWhomSubscribed = await fastify.db.users.findOne(request.body.userId);
-      // if (!userOnWhomSubscribed) { 
-      //   return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      // }
-      // userOnWhomSubscribed.subscribedToUserIds.push(request.params.id);
-      // await fastify.db.users.change(request.body.userId, {subscribedToUserIds: userOnWhomSubscribed.subscribedToUserIds})
       return updatedUserWhoSubscribe;
     }
   );
@@ -134,24 +120,26 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const userWhoUnSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const userWhoUnSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
       if (!userWhoUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      if (!userWhoUnSubscribe.subscribedToUserIds.includes(request.body.userId)) {
+      const userOnWhomUnSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      if (!userOnWhomUnSubscribe) { 
+        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
+      }
+      if (!userWhoUnSubscribe.subscribedToUserIds.includes(request.params.id)) {
         return fastify.httpErrors.badRequest(NOT_SUBSCRIBE_ERROR_MESSAGE);
       }
-      const newSubscribedToUserIdsArray = userWhoUnSubscribe.subscribedToUserIds.filter((id) => id !== request.body.userId);
-      const updatedUserWhoUnSubscribe = await fastify.db.users.change(request.params.id, {subscribedToUserIds: newSubscribedToUserIdsArray});
+      const newSubscribedToUserIdsArray = userWhoUnSubscribe.subscribedToUserIds.filter((id) => id !== request.params.id);
+      const updatedUserWhoUnSubscribe = await fastify.db.users.change(request.body.userId, {subscribedToUserIds: newSubscribedToUserIdsArray});
       if (!updatedUserWhoUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      const userFromWhomUnSubscribed = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const userFromWhomUnSubscribed = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
       if (!userFromWhomUnSubscribed) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      // const newUserSubscribedToIdsArray = userFromWhomUnSubscribed.subscribedToUserIds.filter((id) => id !== request.params.id);
-      // await fastify.db.users.change(request.body.userId, {subscribedToUserIds: newUserSubscribedToIdsArray})
       return updatedUserWhoUnSubscribe;
     }
   );
