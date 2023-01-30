@@ -15,8 +15,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply) {
-      console.log(`111 ${request.body.query}`)
-      console.log(`222 ${request.body.variables}`)
       const { query, variables } = request.body;
       const schema = new GraphQLSchema({
         query: await GQLQuery(fastify),
