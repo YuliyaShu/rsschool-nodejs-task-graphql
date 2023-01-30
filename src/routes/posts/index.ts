@@ -2,11 +2,11 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { createPostBodySchema, changePostBodySchema } from './schema';
 import type { PostEntity } from '../../utils/DB/entities/DBPosts';
-import { POST_ERROR_MESSAGE, USER_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllPosts } from './helperFunctions/getAllPosts';
 import { getPostById } from './helperFunctions/getPostById';
 import { createPost } from './helperFunctions/createPost';
 import { updatePost } from './helperFunctions/updatePost';
+import { deletePost } from './helperFunctions/deletePost';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -43,21 +43,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity | Error> {
-      const post = await fastify.db.posts.findOne({key: 'id', equals: request.params.id});
-      if (!post) { 
-        return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
-      }
-      const deletedPost = await fastify.db.posts.delete(request.params.id);
-      if (!deletedPost) { 
-        return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
-      }
-      const user = await fastify.db.users.findOne({key: 'id', equals: deletedPost.userId});
-      if (!user) { 
-        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      }
-      return deletedPost;
-    }
+    async (request): Promise<PostEntity | Error> => await deletePost(fastify, request.params.id),
   );
 
   fastify.patch(

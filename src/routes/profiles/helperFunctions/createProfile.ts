@@ -6,13 +6,13 @@ import { ProfileEntity } from "../../../utils/DB/entities/DBProfiles";
 
 export const createProfile = async (fastify: FastifyInstance<RawServerDefault, IncomingMessage, ServerResponse<IncomingMessage>, FastifyBaseLogger, JsonSchemaToTsProvider>, args: Omit<ProfileEntity, 'id'>) => {
   const profileUserId = await fastify.db.profiles.findOne({key: 'userId', equals: args.userId});
-    if (profileUserId) { 
-      return fastify.httpErrors.badRequest(PROFILE_EXIST_ERROR_MESSAGE);
-    }
-    const profileMemberTypeId = await fastify.db.memberTypes.findOne({key: 'id', equals: args.memberTypeId});
-    if (!profileMemberTypeId) { 
-      return fastify.httpErrors.badRequest(MEMBERTYPE_ERROR_MESSAGE);
-    }
-    const newProfile = await fastify.db.profiles.create(args);
-    return newProfile;
+  if (profileUserId) { 
+    return fastify.httpErrors.badRequest(PROFILE_EXIST_ERROR_MESSAGE);
+  }
+  const profileMemberTypeId = await fastify.db.memberTypes.findOne({key: 'id', equals: args.memberTypeId});
+  if (!profileMemberTypeId) { 
+    return fastify.httpErrors.badRequest(MEMBERTYPE_ERROR_MESSAGE);
+  }
+  const newProfile = await fastify.db.profiles.create(args);
+  return newProfile;
 }

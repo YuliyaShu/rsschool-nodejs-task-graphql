@@ -70,7 +70,6 @@ export const GQLMutation = async (fastify: FastifyInstance<RawServerDefault, Inc
       args: { input: {type: SubscribeUserGQLType}},
       resolve: async (_, args) => await subscribeToUser(fastify, args.input.id, args.input.userId),
     },
-
     unSubscribeFromUser: {
       type: UserGQLType,
       args: { input: {type: UnsubscribeUserGQLType}},

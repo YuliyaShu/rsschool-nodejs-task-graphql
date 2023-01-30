@@ -6,13 +6,13 @@ import {
   subscribeBodySchema,
 } from './schemas';
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
-import { USER_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllUsers } from './helperFunctions/getAllUsers';
 import { getUserById } from './helperFunctions/getUserById';
 import { createUser } from './helperFunctions/createUser';
 import { updateUser } from './helperFunctions/updateUser';
 import { subscribeToUser } from './helperFunctions/subscribeToUser';
 import { unSubscribeFromUser } from './helperFunctions/unSubscribeFromUser';
+import { deleteUser } from './helperFunctions/deleteUser';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -49,31 +49,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<UserEntity | Error> {
-      const user = await fastify.db.users.findOne({key: 'id', equals: request.params.id});
-      if (!user) {
-        return fastify.httpErrors.badRequest(USER_ERROR_MESSAGE);
-      }
-      const posts = await fastify.db.posts.findMany({key: 'userId', equals: request.params.id});
-      posts.forEach(async post => {
-        if (post) {
-          await fastify.db.posts.delete(post.id);
-        }
-      })
-      const profile = await fastify.db.profiles.findOne({key: 'userId', equals: request.params.id});
-      if (profile) {
-        await fastify.db.profiles.delete(profile.id);
-      }
-      
-      const subscribedUsers = await fastify.db.users.findMany({key: 'subscribedToUserIds', inArray: request.params.id})
-      subscribedUsers.map(async(userWhoSubscribe) => {
-        const updatedSubscriptions = userWhoSubscribe.subscribedToUserIds.filter((id) => id !== request.params.id);
-        await fastify.db.users.change(userWhoSubscribe.id, { subscribedToUserIds: updatedSubscriptions});
-      })
-
-      const deletedUser = await fastify.db.users.delete(request.params.id);
-      return deletedUser;
-    }
+    async (request): Promise<UserEntity | Error> => await deleteUser(fastify, request.params.id),
   );
 
   fastify.post(
