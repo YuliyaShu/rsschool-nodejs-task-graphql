@@ -5,6 +5,7 @@ import type { PostEntity } from '../../utils/DB/entities/DBPosts';
 import { POST_ERROR_MESSAGE, USER_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllPosts } from './helperFunctions/getAllPosts';
 import { getPostById } from './helperFunctions/getPostById';
+import { createPost } from './helperFunctions/createPost';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -31,14 +32,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createPostBodySchema,
       },
     },
-    async function (request, reply): Promise<PostEntity | Error> {
-      const newPost = await fastify.db.posts.create(request.body);
-      const user = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
-      if (!user) { 
-        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      }
-      return newPost;
-    }
+    async (request): Promise<PostEntity | Error> => await createPost(fastify, request.body),
   );
 
   fastify.delete(

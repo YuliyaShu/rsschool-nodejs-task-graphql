@@ -2,9 +2,10 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
-import { MEMBERTYPE_ERROR_MESSAGE, PROFILE_ERROR_MESSAGE, PROFILE_EXIST_ERROR_MESSAGE } from '../../utils/constants';
+import { PROFILE_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllProfiles } from './helperFunctions/getAllProfiles';
 import { getProfileById } from './helperFunctions/getProfileById';
+import { createProfile } from './helperFunctions/createProfile';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -31,18 +32,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createProfileBodySchema,
       },
     },
-    async function (request, reply): Promise<ProfileEntity | Error> {
-      const profileUserId = await fastify.db.profiles.findOne({key: 'userId', equals: request.body.userId});
-      if (profileUserId) { 
-        return fastify.httpErrors.badRequest(PROFILE_EXIST_ERROR_MESSAGE);
-      }
-      const profileMemberTypeId = await fastify.db.memberTypes.findOne({key: 'id', equals: request.body.memberTypeId});
-      if (!profileMemberTypeId) { 
-        return fastify.httpErrors.badRequest(MEMBERTYPE_ERROR_MESSAGE);
-      }
-      const newProfile = await fastify.db.profiles.create(request.body);
-      return newProfile;
-    }
+    async (request): Promise<ProfileEntity | Error> => await createProfile(fastify, request.body),
   );
 
   fastify.delete(

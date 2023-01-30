@@ -37,22 +37,22 @@ export const GQLQuery = async (fastify: FastifyInstance<RawServerDefault, Incomi
     user: {
       type: UserGQLType,
       args: { id: { type: GraphQLID } },
-      resolve: async (args) => await getUserById(fastify, args.id),
+      resolve: async (_, args) => await getUserById(fastify, args.id),
     },
     profile: {
-      type: PostGQLType,
+      type: ProfileGQLType,
       args: { id: { type: GraphQLID } },
-      resolve: async (args) => await getProfileById(fastify, args.id),
+      resolve: async (_, args) => await getProfileById(fastify, args.id),
     },
     post: {
       type: PostGQLType,
       args: { id: { type: GraphQLID } },
-      resolve: async (args) => await getPostById(fastify, args.id),
+      resolve: async (_, args) => await getPostById(fastify, args.id),
     },
     memberType: {
       type: MemberGQLType,
       args: { id: { type: GraphQLID } },
-      resolve: async (args) => await getMemberTypeById(fastify, args.id),
+      resolve: async (_, args) => await getMemberTypeById(fastify, args.id),
     }
   }
 })

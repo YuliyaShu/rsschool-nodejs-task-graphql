@@ -9,6 +9,7 @@ import type { UserEntity } from '../../utils/DB/entities/DBUsers';
 import { USER_ERROR_MESSAGE, SUBSCRIBE_ERROR_MESSAGE, NOT_SUBSCRIBE_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllUsers } from './helperFunctions/getAllUsers';
 import { getUserById } from './helperFunctions/getUserById';
+import { createUser } from './helperFunctions/createUser';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -35,10 +36,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createUserBodySchema,
       },
     },
-    async function (request, reply): Promise<UserEntity> {
-      const newUser = await fastify.db.users.create(request.body);
-      return newUser;
-    }
+    async (request): Promise<UserEntity> => await createUser(fastify, request.body),
   );
 
   fastify.delete(
