@@ -22,7 +22,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity | Error> {
-      const profile = await fastify.db.profiles.findOne({key: "id", equals: request.params.id});
+      const profile = await fastify.db.profiles.findOne({key: 'id', equals: request.params.id});
       if (!profile) { 
         return fastify.httpErrors.notFound(PROFILE_ERROR_MESSAGE);
       }
@@ -38,11 +38,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity | Error> {
-      const profileUserId = await fastify.db.profiles.findOne({key: "userId", equals: request.body.userId});
+      const profileUserId = await fastify.db.profiles.findOne({key: 'userId', equals: request.body.userId});
       if (profileUserId) { 
         return fastify.httpErrors.badRequest(PROFILE_EXIST_ERROR_MESSAGE);
       }
-      const profileMemberTypeId = await fastify.db.memberTypes.findOne({key: "id", equals: request.body.memberTypeId});
+      const profileMemberTypeId = await fastify.db.memberTypes.findOne({key: 'id', equals: request.body.memberTypeId});
       if (!profileMemberTypeId) { 
         return fastify.httpErrors.badRequest(MEMBERTYPE_ERROR_MESSAGE);
       }
@@ -59,7 +59,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity | Error> {
-      const profile = await fastify.db.profiles.findOne({key: "id", equals: request.params.id});
+      const profile = await fastify.db.profiles.findOne({key: 'id', equals: request.params.id});
       if (!profile) { 
         return fastify.httpErrors.badRequest(PROFILE_ERROR_MESSAGE);
       }
@@ -80,7 +80,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<ProfileEntity | Error> {
-      const profile = await fastify.db.profiles.findOne({key: "id", equals: request.params.id});
+      const profile = await fastify.db.profiles.findOne({key: 'id', equals: request.params.id});
       if (!profile) { 
         return fastify.httpErrors.badRequest(PROFILE_ERROR_MESSAGE);
       }

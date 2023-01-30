@@ -20,7 +20,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity | Error> {
-        const post = await fastify.db.posts.findOne({key: "id", equals: request.params.id});
+        const post = await fastify.db.posts.findOne({key: 'id', equals: request.params.id});
         if (!post) { 
           return fastify.httpErrors.notFound(POST_ERROR_MESSAGE);
         }
@@ -37,12 +37,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     },
     async function (request, reply): Promise<PostEntity | Error> {
       const newPost = await fastify.db.posts.create(request.body);
-      const user = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
+      const user = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
       if (!user) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      // user.postIds.push(newPost.id);
-      // fastify.db.users.change(request.body.userId, {postIds: user.postIds});
       return newPost;
     }
   );
@@ -55,7 +53,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity | Error> {
-      const post = await fastify.db.posts.findOne({key: "id", equals: request.params.id});
+      const post = await fastify.db.posts.findOne({key: 'id', equals: request.params.id});
       if (!post) { 
         return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
       }
@@ -63,14 +61,10 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (!deletedPost) { 
         return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
       }
-      const user = await fastify.db.users.findOne({key: "id", equals: deletedPost.userId});
+      const user = await fastify.db.users.findOne({key: 'id', equals: deletedPost.userId});
       if (!user) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      // const newUserPostIdsArray = user.postIds.filter((id) => {
-      //   return id !== deletedPost.id;
-      // });
-      // fastify.db.users.change(deletedPost.userId, {postIds: newUserPostIdsArray});
       return deletedPost;
     }
   );
@@ -84,7 +78,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<PostEntity | Error> {
-      const post = await fastify.db.posts.findOne({key: "id", equals: request.params.id});
+      const post = await fastify.db.posts.findOne({key: 'id', equals: request.params.id});
       if (!post) { 
         return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
       }

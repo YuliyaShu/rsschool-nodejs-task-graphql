@@ -25,7 +25,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
     },
     async function (request, reply): Promise<UserEntity | Error> {
       const id = request.params.id;
-      const user = await fastify.db.users.findOne({key: "id", equals: id});
+      const user = await fastify.db.users.findOne({key: 'id', equals: id});
       if (!user) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -54,22 +54,22 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const user = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const user = await fastify.db.users.findOne({key: 'id', equals: request.params.id});
       if (!user) {
         return fastify.httpErrors.badRequest(USER_ERROR_MESSAGE);
       }
-      const posts = await fastify.db.posts.findMany({key: "userId", equals: request.params.id});
+      const posts = await fastify.db.posts.findMany({key: 'userId', equals: request.params.id});
       posts.forEach(async post => {
         if (post) {
           await fastify.db.posts.delete(post.id);
         }
       })
-      const profile = await fastify.db.profiles.findOne({key: "userId", equals: request.params.id});
+      const profile = await fastify.db.profiles.findOne({key: 'userId', equals: request.params.id});
       if (profile) {
         await fastify.db.profiles.delete(profile.id);
       }
       
-      const subscribedUsers = await fastify.db.users.findMany({key: "subscribedToUserIds", inArray: request.params.id})
+      const subscribedUsers = await fastify.db.users.findMany({key: 'subscribedToUserIds', inArray: request.params.id})
       subscribedUsers.map(async(userWhoSubscribe) => {
         const updatedSubscriptions = userWhoSubscribe.subscribedToUserIds.filter((id) => id !== request.params.id);
         await fastify.db.users.change(userWhoSubscribe.id, { subscribedToUserIds: updatedSubscriptions});
@@ -89,11 +89,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const userWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
+      const userWhoSubscribe = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
       if (!userWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      const userOnWhomSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const userOnWhomSubscribe = await fastify.db.users.findOne({key: 'id', equals: request.params.id});
       if (!userOnWhomSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -103,7 +103,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       } else {
         return fastify.httpErrors.conflict(SUBSCRIBE_ERROR_MESSAGE);
       }
-      const updatedUserWhoSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
+      const updatedUserWhoSubscribe = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
       if (!updatedUserWhoSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -120,11 +120,11 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const userWhoUnSubscribe = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
+      const userWhoUnSubscribe = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
       if (!userWhoUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      const userOnWhomUnSubscribe = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const userOnWhomUnSubscribe = await fastify.db.users.findOne({key: 'id', equals: request.params.id});
       if (!userOnWhomUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -136,7 +136,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       if (!updatedUserWhoUnSubscribe) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
-      const userFromWhomUnSubscribed = await fastify.db.users.findOne({key: "id", equals: request.body.userId});
+      const userFromWhomUnSubscribed = await fastify.db.users.findOne({key: 'id', equals: request.body.userId});
       if (!userFromWhomUnSubscribed) { 
         return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
       }
@@ -153,7 +153,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
       },
     },
     async function (request, reply): Promise<UserEntity | Error> {
-      const user = await fastify.db.users.findOne({key: "id", equals: request.params.id});
+      const user = await fastify.db.users.findOne({key: 'id', equals: request.params.id});
       if (!user) {
         return fastify.httpErrors.badRequest(USER_ERROR_MESSAGE);
       }
