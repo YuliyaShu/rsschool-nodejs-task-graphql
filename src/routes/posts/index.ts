@@ -3,14 +3,15 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { createPostBodySchema, changePostBodySchema } from './schema';
 import type { PostEntity } from '../../utils/DB/entities/DBPosts';
 import { POST_ERROR_MESSAGE, USER_ERROR_MESSAGE } from '../../utils/constants';
+import { getAllPosts } from './helperFunctions/getAllPosts';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<PostEntity[]> {
-    const allPosts = await fastify.db.posts.findMany();
-    return allPosts;
-  });
+  fastify.get(
+    '/',
+    async (): Promise<PostEntity[]> => await getAllPosts(fastify),
+  );
 
   fastify.get(
     '/:id',

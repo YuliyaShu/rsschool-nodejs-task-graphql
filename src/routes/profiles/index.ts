@@ -3,16 +3,15 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
 import { MEMBERTYPE_ERROR_MESSAGE, PROFILE_ERROR_MESSAGE, PROFILE_EXIST_ERROR_MESSAGE } from '../../utils/constants';
+import { getAllProfiles } from './helperFunctions/getAllProfiles';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<
-    ProfileEntity[]
-  > {
-    const allProfiles = await fastify.db.profiles.findMany();
-    return allProfiles;
-  });
+  fastify.get(
+    '/',
+    async (): Promise<ProfileEntity[]> => await getAllProfiles(fastify),
+  );
 
   fastify.get(
     '/:id',

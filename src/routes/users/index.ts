@@ -7,14 +7,15 @@ import {
 } from './schemas';
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
 import { USER_ERROR_MESSAGE, SUBSCRIBE_ERROR_MESSAGE, NOT_SUBSCRIBE_ERROR_MESSAGE } from '../../utils/constants';
+import { getAllUsers } from './helperFunctions/getAllUsers';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<UserEntity[]> {
-    const allUsers = await fastify.db.users.findMany();
-    return allUsers;
-  });
+  fastify.get(
+    '/',
+    async (): Promise<UserEntity[]> => await getAllUsers(fastify),
+  );
 
   fastify.get(
     '/:id',

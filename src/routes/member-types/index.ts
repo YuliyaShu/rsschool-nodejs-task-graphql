@@ -3,16 +3,15 @@ import { idParamSchema } from '../../utils/reusedSchemas';
 import { changeMemberTypeBodySchema } from './schema';
 import type { MemberTypeEntity } from '../../utils/DB/entities/DBMemberTypes';
 import { MEMBERTYPE_ERROR_MESSAGE } from '../../utils/constants';
+import { getAllMemberTypes } from './helperFunctions/getAllMemberTypes';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<
-    MemberTypeEntity[]
-  > {
-    const allMemberTypes = await fastify.db.memberTypes.findMany();
-    return allMemberTypes;
-  });
+  fastify.get(
+    '/',
+    async (): Promise<MemberTypeEntity[]> => await getAllMemberTypes(fastify),
+  );
 
   fastify.get(
     '/:id',
