@@ -32,7 +32,6 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         variableValues: variables,
         contextValue: fastify,
       });
-      
     }
   );
 };
