@@ -71,6 +71,7 @@ test('profiles', async (t) => {
   await t.test('PATCH /profiles/:id => success', async (t) => {
     const { body: user1 } = await createUser(app);
     const { body: profile1 } = await createProfile(app, user1.id, 'basic');
+
     const changedCity = 'Svetlogorsk';
     const changedMemberTypeId = 'business';
     await app.inject({
