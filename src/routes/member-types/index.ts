@@ -2,9 +2,9 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { changeMemberTypeBodySchema } from './schema';
 import type { MemberTypeEntity } from '../../utils/DB/entities/DBMemberTypes';
-import { MEMBERTYPE_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllMemberTypes } from './helperFunctions/getAllMemberTypes';
 import { getMemberTypeById } from './helperFunctions/getMemberTypeById';
+import { updateMemberType } from './helperFunctions/updateMemberType';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -32,17 +32,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<MemberTypeEntity | Error> {
-      const memberType = await fastify.db.memberTypes.findOne({key: 'id', equals: request.params.id});
-      if (!memberType) { 
-        return fastify.httpErrors.badRequest(MEMBERTYPE_ERROR_MESSAGE);
-      }
-      const updatedMemberType = await fastify.db.memberTypes.change(request.params.id, request.body);
-      if (!updatedMemberType) { 
-        return fastify.httpErrors.notFound(MEMBERTYPE_ERROR_MESSAGE);
-      }
-      return updatedMemberType;
-    }
+    async (request): Promise<MemberTypeEntity | Error> => await updateMemberType(fastify, request.params.id, request.body),
   );
 };
 

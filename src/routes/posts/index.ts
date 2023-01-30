@@ -6,6 +6,7 @@ import { POST_ERROR_MESSAGE, USER_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllPosts } from './helperFunctions/getAllPosts';
 import { getPostById } from './helperFunctions/getPostById';
 import { createPost } from './helperFunctions/createPost';
+import { updatePost } from './helperFunctions/updatePost';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -67,17 +68,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity | Error> {
-      const post = await fastify.db.posts.findOne({key: 'id', equals: request.params.id});
-      if (!post) { 
-        return fastify.httpErrors.badRequest(POST_ERROR_MESSAGE);
-      }
-      const updatedPost = await fastify.db.posts.change(request.params.id, request.body);
-      if (!updatedPost) { 
-        return fastify.httpErrors.notFound(POST_ERROR_MESSAGE);
-      }
-      return updatedPost;
-    }
+    async (request): Promise<PostEntity | Error> => await updatePost(fastify, request.params.id, request.body),
   );
 };
 
