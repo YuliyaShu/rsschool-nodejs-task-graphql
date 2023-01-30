@@ -1,3 +1,21 @@
+[Task](https://github.com/AlreadyBored/nodejs-assignments/blob/main/assignments/graphql-service/assignment.md)
+### Graphql
+## Installation
+1. Clone/download repo https://github.com/YuliyaShu/rsschool-nodejs-task-graphql.git
+2. git switch dev, if necessary
+3. `npm install`
+
+## Usage for cross-check
+`npm run dev`
+
+`npm run test`
+
+Go to [Postman](https://web.postman.co/)
+New request -> POST http://127.0.0.1:3000/graphql
+Then send request with Body -> GraphQL -> Query (examples of query bodies you can find in pull request description https://github.com/YuliyaShu/rsschool-nodejs-task-graphql/pull/1)
+
+**!!!!!!! Don't forget to paste necessary ids to the query bodies**
+
 ## Assignment: Graphql
 ### Tasks:
 1. Add logic to the restful endpoints (users, posts, profiles, member-types folders in ./src/routes).  

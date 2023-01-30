@@ -2,11 +2,19 @@ import { FastifyPluginAsyncJsonSchemaToTs } from '@fastify/type-provider-json-sc
 import { idParamSchema } from '../../utils/reusedSchemas';
 import { createPostBodySchema, changePostBodySchema } from './schema';
 import type { PostEntity } from '../../utils/DB/entities/DBPosts';
+import { getAllPosts } from './helperFunctions/getAllPosts';
+import { getPostById } from './helperFunctions/getPostById';
+import { createPost } from './helperFunctions/createPost';
+import { updatePost } from './helperFunctions/updatePost';
+import { deletePost } from './helperFunctions/deletePost';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
 ): Promise<void> => {
-  fastify.get('/', async function (request, reply): Promise<PostEntity[]> {});
+  fastify.get(
+    '/',
+    async (): Promise<PostEntity[]> => await getAllPosts(fastify),
+  );
 
   fastify.get(
     '/:id',
@@ -15,7 +23,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {}
+    async (request): Promise<PostEntity | Error> => await getPostById(fastify, request.params.id),
   );
 
   fastify.post(
@@ -25,7 +33,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         body: createPostBodySchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {}
+    async (request): Promise<PostEntity | Error> => await createPost(fastify, request.body),
   );
 
   fastify.delete(
@@ -35,7 +43,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {}
+    async (request): Promise<PostEntity | Error> => await deletePost(fastify, request.params.id),
   );
 
   fastify.patch(
@@ -46,7 +54,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<PostEntity> {}
+    async (request): Promise<PostEntity | Error> => await updatePost(fastify, request.params.id, request.body),
   );
 };
 
