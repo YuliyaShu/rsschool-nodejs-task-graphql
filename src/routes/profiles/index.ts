@@ -4,6 +4,7 @@ import { createProfileBodySchema, changeProfileBodySchema } from './schema';
 import type { ProfileEntity } from '../../utils/DB/entities/DBProfiles';
 import { MEMBERTYPE_ERROR_MESSAGE, PROFILE_ERROR_MESSAGE, PROFILE_EXIST_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllProfiles } from './helperFunctions/getAllProfiles';
+import { getProfileById } from './helperFunctions/getProfileById';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -20,13 +21,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<ProfileEntity | Error> {
-      const profile = await fastify.db.profiles.findOne({key: 'id', equals: request.params.id});
-      if (!profile) { 
-        return fastify.httpErrors.notFound(PROFILE_ERROR_MESSAGE);
-      }
-      return profile;
-    }
+    async (request): Promise<ProfileEntity | Error> => await getProfileById(fastify, request.params.id),
   );
 
   fastify.post(

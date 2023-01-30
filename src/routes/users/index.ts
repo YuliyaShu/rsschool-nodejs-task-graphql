@@ -8,6 +8,7 @@ import {
 import type { UserEntity } from '../../utils/DB/entities/DBUsers';
 import { USER_ERROR_MESSAGE, SUBSCRIBE_ERROR_MESSAGE, NOT_SUBSCRIBE_ERROR_MESSAGE } from '../../utils/constants';
 import { getAllUsers } from './helperFunctions/getAllUsers';
+import { getUserById } from './helperFunctions/getUserById';
 
 const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
   fastify
@@ -24,14 +25,7 @@ const plugin: FastifyPluginAsyncJsonSchemaToTs = async (
         params: idParamSchema,
       },
     },
-    async function (request, reply): Promise<UserEntity | Error> {
-      const id = request.params.id;
-      const user = await fastify.db.users.findOne({key: 'id', equals: id});
-      if (!user) { 
-        return fastify.httpErrors.notFound(USER_ERROR_MESSAGE);
-      }
-      return user;
-    }
+    async (request): Promise<UserEntity | Error> => await getUserById(fastify, request.params.id),
   );
 
   fastify.post(
